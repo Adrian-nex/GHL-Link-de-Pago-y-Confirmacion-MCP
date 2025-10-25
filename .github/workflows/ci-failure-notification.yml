@@ -40,7 +40,7 @@ jobs:
         echo "4. Re-run the workflow" >> failure_report.md
         
     - name: Upload Failure Report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       with:
         name: failure-report
         path: failure_report.md

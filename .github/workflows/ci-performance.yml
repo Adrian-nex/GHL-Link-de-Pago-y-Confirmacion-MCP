@@ -37,7 +37,7 @@ jobs:
         echo "- 🎯 Ready for deployment" >> performance_report.md
         
     - name: Upload Performance Report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       with:
         name: performance-report
         path: performance_report.md
