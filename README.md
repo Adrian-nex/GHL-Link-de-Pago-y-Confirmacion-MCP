@@ -11,9 +11,9 @@
 
 *Procesamiento asíncrono de webhooks • Reintentos automáticos • Integración CRM*
 
-[![CI Status](https://img.shields.io/badge/CI-5/5%20PASSED-brightgreen?style=flat-square)](https://github.com)
-[![Coverage](https://img.shields.io/badge/Coverage-41%25-yellow?style=flat-square)](https://github.com)
-[![Tests](https://img.shields.io/badge/Tests-5%20Passing-brightgreen?style=flat-square)](https://github.com)
+[![CI Status](https://github.com/Adrian-nex/Ejer02_done/workflows/CI%20Pipeline/badge.svg)](https://github.com/Adrian-nex/Ejer02_done/actions)
+[![Coverage](https://img.shields.io/badge/Coverage-41%25-yellow?style=flat-square)](https://github.com/Adrian-nex/Ejer02_done/actions)
+[![Tests](https://img.shields.io/badge/Tests-5%20Passing-brightgreen?style=flat-square)](https://github.com/Adrian-nex/Ejer02_done/actions)
 
 </div>
 

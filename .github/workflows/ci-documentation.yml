@@ -1,0 +1,92 @@
+name: CI Documentation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  documentation-check:
+    runs-on: ubuntu-latest
+    name: Documentation Check
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install sphinx sphinx-rtd-theme
+        
+    - name: Verificar documentación
+      run: |
+        echo "📚 Checking documentation..."
+        
+        # Verificar que existan archivos README
+        if [ ! -f "README.md" ]; then
+          echo "❌ README.md not found"
+          exit 1
+        fi
+        
+        # Verificar que existan archivos de documentación
+        if [ ! -d "docs" ]; then
+          echo "❌ docs/ directory not found"
+          exit 1
+        fi
+        
+        # Verificar que existan docstrings en Python
+        echo "🔍 Checking Python docstrings..."
+        python -c "
+        import ast
+        import os
+        
+        def check_docstrings(filepath):
+            with open(filepath, 'r', encoding='utf-8') as f:
+                tree = ast.parse(f.read())
+            
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                    if not ast.get_docstring(node):
+                        print(f'⚠️  {filepath}:{node.lineno} - {node.name} missing docstring')
+        
+        for root, dirs, files in os.walk('.'):
+            for file in files:
+                if file.endswith('.py') and not file.startswith('__'):
+                    filepath = os.path.join(root, file)
+                    check_docstrings(filepath)
+        "
+        
+    - name: Generar documentación
+      run: |
+        echo "📖 Generating documentation..."
+        
+        # Crear índice de documentación
+        echo "# Documentación del Proyecto" > docs/INDEX.md
+        echo "" >> docs/INDEX.md
+        echo "## Archivos de Documentación" >> docs/INDEX.md
+        echo "" >> docs/INDEX.md
+        
+        for file in docs/*.md; do
+          if [ -f "$file" ]; then
+            filename=$(basename "$file")
+            echo "- [$filename]($filename)" >> docs/INDEX.md
+          fi
+        done
+        
+    - name: Upload Documentation
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: docs/

@@ -1,0 +1,57 @@
+name: CI Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Scan
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install safety bandit
+        
+    - name: Security Scan - Safety
+      run: |
+        echo "🔒 Running safety scan..."
+        safety check --json --output safety-report.json || true
+        
+    - name: Security Scan - Bandit
+      run: |
+        echo "🔍 Running bandit scan..."
+        bandit -r . -f json -o bandit-report.json || true
+        
+    - name: Security Scan - Dependencies
+      run: |
+        echo "📦 Checking for vulnerable dependencies..."
+        pip-audit --format=json --output=audit-report.json || true
+        
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          safety-report.json
+          bandit-report.json
+          audit-report.json

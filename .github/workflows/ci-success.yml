@@ -1,0 +1,27 @@
+name: CI Success Notification
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+
+jobs:
+  notify-success:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    name: Success Notification
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Success Message
+      run: |
+        echo "🎉 CI Pipeline completed successfully!"
+        echo "✅ All checks passed"
+        echo "🚀 Code is ready for deployment"
+        
+    - name: Update README Status
+      run: |
+        echo "Updating project status indicators..."
+        # Aquí podrías agregar lógica para actualizar badges dinámicamente

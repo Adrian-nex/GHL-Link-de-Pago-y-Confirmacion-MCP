@@ -1,0 +1,65 @@
+name: CI Debug Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug_level:
+        description: 'Debug Level'
+        required: true
+        default: 'basic'
+        type: choice
+        options:
+        - basic
+        - verbose
+        - full
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    name: Debug CI Issues
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        
+    - name: Debug - Información del sistema
+      run: |
+        echo "=== SYSTEM INFO ==="
+        python --version
+        pip --version
+        which python
+        which pip
+        echo "=== PYTHON PATH ==="
+        python -c "import sys; print('\n'.join(sys.path))"
+        
+    - name: Debug - Instalar dependencias
+      run: |
+        echo "=== INSTALLING DEPENDENCIES ==="
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        echo "=== INSTALLED PACKAGES ==="
+        pip list
+        
+    - name: Debug - Verificar estructura del proyecto
+      run: |
+        echo "=== PROJECT STRUCTURE ==="
+        find . -name "*.py" | head -20
+        echo "=== DJANGO SETTINGS ==="
+        python -c "import os; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings'); import django; django.setup(); from django.conf import settings; print('INSTALLED_APPS:', settings.INSTALLED_APPS)"
+        
+    - name: Debug - Verificar base de datos
+      run: |
+        echo "=== DATABASE CHECK ==="
+        python manage.py check --deploy
+        python manage.py makemigrations --check --dry-run
+        
+    - name: Debug - Ejecutar tests con verbose
+      run: |
+        echo "=== RUNNING TESTS ==="
+        pytest -v --tb=short --cov=. --cov-report=term-missing

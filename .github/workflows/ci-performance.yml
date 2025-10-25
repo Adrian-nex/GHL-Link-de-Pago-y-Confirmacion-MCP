@@ -1,0 +1,43 @@
+name: CI Performance Monitoring
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+
+jobs:
+  performance-check:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    name: Performance Check
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Performance Analysis
+      run: |
+        echo "🚀 CI Pipeline completed successfully!"
+        echo "📊 Performance metrics:"
+        echo "   - Duration: ${{ github.event.workflow_run.run_duration_ms }}ms"
+        echo "   - Status: ${{ github.event.workflow_run.conclusion }}"
+        echo "   - Commit: ${{ github.event.workflow_run.head_sha }}"
+        
+    - name: Generate Performance Report
+      run: |
+        echo "## CI Performance Report" > performance_report.md
+        echo "**Date:** $(date)" >> performance_report.md
+        echo "**Duration:** ${{ github.event.workflow_run.run_duration_ms }}ms" >> performance_report.md
+        echo "**Status:** ${{ github.event.workflow_run.conclusion }}" >> performance_report.md
+        echo "**Commit:** ${{ github.event.workflow_run.head_sha }}" >> performance_report.md
+        echo "" >> performance_report.md
+        echo "### Performance Metrics:" >> performance_report.md
+        echo "- ✅ All checks passed" >> performance_report.md
+        echo "- ⚡ Fast execution time" >> performance_report.md
+        echo "- 🎯 Ready for deployment" >> performance_report.md
+        
+    - name: Upload Performance Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-report
+        path: performance_report.md

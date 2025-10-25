@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI Matrix Testing
 
 on:
   push:
@@ -10,21 +10,30 @@ env:
   PYTHON_VERSION: '3.11'
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    name: Tests & Code Quality
+  test-matrix:
+    runs-on: ${{ matrix.os }}
+    name: Tests on ${{ matrix.os }} Python ${{ matrix.python-version }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.11', '3.12']
+        exclude:
+          - os: macos-latest
+            python-version: '3.12'
     
     steps:
     - name: Checkout código
       uses: actions/checkout@v4
       
-    - name: Configurar Python
+    - name: Configurar Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ env.PYTHON_VERSION }}
+        python-version: ${{ matrix.python-version }}
         cache: 'pip'
         
-    - name: Instalar dependencias del sistema
+    - name: Instalar dependencias del sistema (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y sqlite3
@@ -45,7 +54,8 @@ jobs:
     - name: Ejecutar verificaciones de CI
       run: python run_ci_checks.py
       
-    - name: Subir cobertura
+    - name: Subir cobertura (solo en Ubuntu)
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
