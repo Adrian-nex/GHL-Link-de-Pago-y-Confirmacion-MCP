@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pagos - ReflexoPerú</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Sistema de Pagos</h1>
+            <p>ReflexoPerú - Gestión de Citas y Pagos</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Barra de Estadísticas -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">Total Pagos</div>
+                <div class="stat-value" id="total-payments">0</div>
+            </div>
+            <div class="stat-item" style="border-color: #48bb78;">
+                <div class="stat-label">Aprobados</div>
+                <div class="stat-value" id="approved-payments" style="color: #22543d;">0</div>
+            </div>
+            <div class="stat-item" style="border-color: #ed8936;">
+                <div class="stat-label">Pendientes</div>
+                <div class="stat-value" id="pending-payments" style="color: #7c2d12;">0</div>
+            </div>
+            <div class="stat-item" style="border-color: #9f7aea;">
+                <div class="stat-label">Contactos GHL</div>
+                <div class="stat-value" id="total-contacts" style="color: #553c9a;">0</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Formulario de Creación de Pago -->
+            <div class="card">
+                <h2>Crear Preferencia de Pago</h2>
+                
+                <div id="alert-create" class="alert"></div>
+                
+                <form id="payment-form">
+                    <div class="form-group">
+                        <label for="appointmentId">Nro de Cita</label>
+                        <input type="text" id="appointmentId" name="appointmentId" required 
+                               placeholder="Cita_N001" readonly>
+                        <div class="auto-id-info">
+                            ✓ Número generado automáticamente basado en el historial
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="searchContact">Buscar y Seleccionar Contacto</label>
+                        <input type="text" id="searchContact" class="search-box" 
+                               placeholder="Buscar por nombre, email o etiqueta...">
+                        <div class="contact-list" id="contact-list">
+                            <div class="no-data" style="padding: 20px;">Cargando contactos...</div>
+                        </div>
+                        <input type="hidden" id="contactId" name="contactId" required>
+                        <div id="selected-contact-info" class="selected-contact-info">
+                            <div id="selected-contact-details"></div>
+                            <button type="button" class="btn-deselect" onclick="deselectContact()">
+                                ✕ Cambiar contacto
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amount">Monto (PEN)</label>
+                        <input type="number" id="amount" name="amount" step="0.01" min="1" required 
+                               placeholder="50.00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Descripción</label>
+                        <input type="text" id="description" name="description" 
+                               placeholder="Cita ReflexoPerú" value="Cita ReflexoPerú">
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submit-btn">
+                        Crear Preferencia de Pago
+                    </button>
+                </form>
+                
+                <div class="loading" id="loading-create">
+                    <div class="spinner"></div>
+                    <p style="color: #718096;">Creando preferencia...</p>
+                </div>
+            </div>
+            
+            <!-- Vista Rápida -->
+            <div class="card">
+                <h2>Vista Rápida</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 0.875rem; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+                        Últimos Pagos
+                    </h3>
+                    <div id="recent-payments" style="font-size: 0.875rem; color: #4a5568;">
+                        <div class="loading" style="display: block; padding: 20px;">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 style="font-size: 0.875rem; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+                        Estado del Sistema
+                    </h3>
+                    <div style="font-size: 0.875rem;">
+                        <div style="display: flex; align-items: center; padding: 8px 0; color: #22543d;">
+                            <span style="margin-right: 8px;">●</span> Django Server
+                        </div>
+                        <div style="display: flex; align-items: center; padding: 8px 0; color: #22543d;">
+                            <span style="margin-right: 8px;">●</span> Mercado Pago API
+                        </div>
+                        <div style="display: flex; align-items: center; padding: 8px 0; color: #22543d;">
+                            <span style="margin-right: 8px;">●</span> GoHighLevel API
+                        </div>
+                        <div style="display: flex; align-items: center; padding: 8px 0; color: #22543d;">
+                            <span style="margin-right: 8px;">●</span> Webhook Listener
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial de Pagos -->
+        <div class="card payment-history">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="margin: 0;">Historial de Pagos</h2>
+                <button onclick="loadPayments()" class="btn btn-secondary btn-small">
+                    Actualizar
+                </button>
+            </div>
+            
+            <div class="loading" id="loading-history">
+                <div class="spinner"></div>
+                <p style="color: #718096;">Cargando historial...</p>
+            </div>
+            
+            <div id="payments-container"></div>
+        </div>
+    </div>
+    
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

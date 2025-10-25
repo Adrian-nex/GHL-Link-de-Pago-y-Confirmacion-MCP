@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pagos - ReflexoPerú</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistema de Pagos</h1>
+            <p>Gestión de pagos para citas médicas - ReflexoPerú</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">Total Contactos</div>
+                <div class="stat-value" id="total-contacts">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Total Pagos</div>
+                <div class="stat-value" id="total-payments">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Pagos Aprobados</div>
+                <div class="stat-value" id="approved-payments">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Pagos Pendientes</div>
+                <div class="stat-value" id="pending-payments">0</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>Crear Nuevo Pago</h2>
+                
+                <div id="alert-create" class="alert" style="display: none;"></div>
+                
+                <form id="payment-form">
+                    <div class="form-group">
+                        <label for="appointmentId">Número de Cita</label>
+                        <input type="text" id="appointmentId" name="appointmentId" readonly>
+                        <div class="auto-id-info">
+                            ID generado automáticamente
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactId">ID del Contacto</label>
+                        <input type="text" id="contactId" name="contactId" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Monto (S/)</label>
+                        <input type="number" id="amount" name="amount" step="0.01" min="0" required placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Descripción</label>
+                        <input type="text" id="description" name="description" value="Cita ReflexoPerú" placeholder="Descripción del pago">
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="btn">
+                        Crear Pago
+                    </button>
+                    
+                    <div id="loading-create" class="loading">
+                        <div class="spinner"></div>
+                        <div>Creando pago...</div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Seleccionar Contacto</h2>
+                
+                <div id="searchContact" class="search-box-container">
+                    <input type="text" id="searchContact" placeholder="Buscar contacto por nombre, email o etiquetas..." class="search-box">
+                </div>
+                
+                <div id="contact-list" class="contact-list"></div>
+                
+                <div id="selected-contact-info" class="selected-contact-info">
+                    <div id="selected-contact-details"></div>
+                    <button type="button" class="btn-deselect" onclick="deselectContact()">
+                        Cambiar Contacto
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card payment-history">
+            <h2>Historial de Pagos</h2>
+            
+            <div id="loading-history" class="loading">
+                <div class="spinner"></div>
+                <div>Cargando historial...</div>
+            </div>
+            
+            <div id="payments-container"></div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
