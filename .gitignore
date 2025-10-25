@@ -52,6 +52,19 @@ htmlcov/
 .pytest_cache/
 .coverage.*
 
+# Development files
+create_prs.py
+create_prs_simple.py
+PULL_REQUESTS.md
+PR_SUMMARY.md
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
 # Logs
 logs/*.log
 
